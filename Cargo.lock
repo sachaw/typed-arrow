@@ -136,6 +136,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "arrow-array"
+version = "59.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc9a4a4b2b5ecd0e04df03471661cb61f28bed3c7fd50994715129b01b2edb97"
+dependencies = [
+ "ahash",
+ "arrow-buffer 59.2.0",
+ "arrow-data 59.2.0",
+ "arrow-schema 59.2.0",
+ "chrono",
+ "half",
+ "hashbrown 0.17.1",
+ "num-complex",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
 name = "arrow-buffer"
 version = "55.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -165,7 +183,7 @@ checksum = "a2819d893750cb3380ab31ebdc8c68874dd4429f90fd09180f3c93538bd21626"
 dependencies = [
  "bytes",
  "half",
- "num-bigint",
+ "num-bigint 0.4.6",
  "num-traits",
 ]
 
@@ -177,7 +195,19 @@ checksum = "898f4cf1e9598fdb77f356fdf2134feedfd0ee8d5a4e0a5f573e7d0aec16baa4"
 dependencies = [
  "bytes",
  "half",
- "num-bigint",
+ "num-bigint 0.4.6",
+ "num-traits",
+]
+
+[[package]]
+name = "arrow-buffer"
+version = "59.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c12b576ef18c1deb80925a248b25ad84f419198d791b8e293fc6aaa60441fe90"
+dependencies = [
+ "bytes",
+ "half",
+ "num-bigint 0.5.1",
  "num-traits",
 ]
 
@@ -293,6 +323,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "arrow-data"
+version = "59.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "723fe4aeed7604e00b9883a465af4ff0a0e6c44c03e41a68c3d1cbc403e0e44d"
+dependencies = [
+ "arrow-buffer 59.2.0",
+ "arrow-schema 59.2.0",
+ "half",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
 name = "arrow-ipc"
 version = "55.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -383,6 +426,12 @@ name = "arrow-schema"
 version = "58.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c30a1365d7a7dc50cc847e54154e6af49e4c4b0fddc9f607b687f29212082743"
+
+[[package]]
+name = "arrow-schema"
+version = "59.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e6fed2ca0d1eade57e811cbe73b98ad50cc08a1183e13b2d2aa43a7df593f40e"
 
 [[package]]
 name = "arrow-select"
@@ -809,6 +858,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
 
 [[package]]
+name = "hashbrown"
+version = "0.17.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
+
+[[package]]
 name = "hermit-abi"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1101,7 +1156,7 @@ version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "35bd024e8b2ff75562e5f34e7f4905839deb4b22955ef5e73d2fea1b9813cb23"
 dependencies = [
- "num-bigint",
+ "num-bigint 0.4.6",
  "num-complex",
  "num-integer",
  "num-iter",
@@ -1114,6 +1169,16 @@ name = "num-bigint"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a5e44f723f1133c9deac646763579fdb3ac745e418f2a7af9cd0c431da1f20b9"
+dependencies = [
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
+name = "num-bigint"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "93e7820bc0a80a0238e650327316f929ba18d5be054b647490a3a6a339f3e7c0"
 dependencies = [
  "num-integer",
  "num-traits",
@@ -1154,7 +1219,7 @@ version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f83d14da390562dca69fc84082e73e548e1ad308d24accdedd2720017cb37824"
 dependencies = [
- "num-bigint",
+ "num-bigint 0.4.6",
  "num-integer",
  "num-traits",
 ]
@@ -1213,7 +1278,7 @@ dependencies = [
  "hashbrown 0.15.5",
  "lz4_flex 0.11.5",
  "num",
- "num-bigint",
+ "num-bigint 0.4.6",
  "paste",
  "seq-macro",
  "simdutf8",
@@ -1246,7 +1311,7 @@ dependencies = [
  "hashbrown 0.16.1",
  "lz4_flex 0.11.5",
  "num",
- "num-bigint",
+ "num-bigint 0.4.6",
  "paste",
  "seq-macro",
  "simdutf8",
@@ -1278,7 +1343,7 @@ dependencies = [
  "half",
  "hashbrown 0.16.1",
  "lz4_flex 0.12.0",
- "num-bigint",
+ "num-bigint 0.4.6",
  "num-integer",
  "num-traits",
  "paste",
@@ -1311,7 +1376,7 @@ dependencies = [
  "half",
  "hashbrown 0.16.1",
  "lz4_flex 0.13.0",
- "num-bigint",
+ "num-bigint 0.4.6",
  "num-integer",
  "num-traits",
  "paste",
@@ -1734,18 +1799,22 @@ dependencies = [
  "arrow-array 56.2.0",
  "arrow-array 57.1.0",
  "arrow-array 58.1.0",
+ "arrow-array 59.2.0",
  "arrow-buffer 55.2.0",
  "arrow-buffer 56.2.0",
  "arrow-buffer 57.1.0",
  "arrow-buffer 58.1.0",
+ "arrow-buffer 59.2.0",
  "arrow-data 55.2.0",
  "arrow-data 56.2.0",
  "arrow-data 57.1.0",
  "arrow-data 58.1.0",
+ "arrow-data 59.2.0",
  "arrow-schema 55.2.0",
  "arrow-schema 56.2.0",
  "arrow-schema 57.1.0",
  "arrow-schema 58.1.0",
+ "arrow-schema 59.2.0",
  "half",
  "jiff",
  "serde",
