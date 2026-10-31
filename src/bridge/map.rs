@@ -2,10 +2,27 @@
 
 use std::{collections::BTreeMap, sync::Arc};
 
-use arrow_array::{MapArray, builder::MapBuilder};
+use arrow_array::{
+    MapArray,
+    builder::{MapBuilder, MapFieldNames},
+};
 use arrow_schema::{DataType, Field};
 
 use super::ArrowBinding;
+
+// Arrow's default child names differ across major versions; the schema and
+// every builder name them explicitly so the two always agree.
+const ENTRIES: &str = "entries";
+const KEYS: &str = "keys";
+const VALUES: &str = "values";
+
+fn field_names() -> MapFieldNames {
+    MapFieldNames {
+        entry: ENTRIES.to_string(),
+        key: KEYS.to_string(),
+        value: VALUES.to_string(),
+    }
+}
 
 /// Wrapper denoting an Arrow `MapArray` column with entries `(K, V)`.
 ///
@@ -88,16 +105,16 @@ where
     type Builder = MapBuilder<<K as ArrowBinding>::Builder, <V as ArrowBinding>::Builder>;
     type Array = MapArray;
     fn data_type() -> DataType {
-        let key_f = Field::new("keys", <K as ArrowBinding>::data_type(), false);
-        // MapBuilder names children `keys` and `values`; value field is nullable
-        let val_f = Field::new("values", <V as ArrowBinding>::data_type(), true);
+        let key_f = Field::new(KEYS, <K as ArrowBinding>::data_type(), false);
+        // The value field is nullable.
+        let val_f = Field::new(VALUES, <V as ArrowBinding>::data_type(), true);
         let entries = DataType::Struct(vec![Arc::new(key_f), Arc::new(val_f)].into());
-        DataType::Map(Field::new("entries", entries, false).into(), SORTED)
+        DataType::Map(Field::new(ENTRIES, entries, false).into(), SORTED)
     }
     fn new_builder(_capacity: usize) -> Self::Builder {
         let kb = <K as ArrowBinding>::new_builder(0);
         let vb = <V as ArrowBinding>::new_builder(0);
-        MapBuilder::new(None, kb, vb)
+        MapBuilder::new(Some(field_names()), kb, vb)
     }
     fn append_value(b: &mut Self::Builder, v: &Self) {
         for (k, val) in &v.0 {
@@ -125,15 +142,15 @@ where
     type Builder = MapBuilder<<K as ArrowBinding>::Builder, <V as ArrowBinding>::Builder>;
     type Array = MapArray;
     fn data_type() -> DataType {
-        let key_f = Field::new("keys", <K as ArrowBinding>::data_type(), false);
-        let val_f = Field::new("values", <V as ArrowBinding>::data_type(), true);
+        let key_f = Field::new(KEYS, <K as ArrowBinding>::data_type(), false);
+        let val_f = Field::new(VALUES, <V as ArrowBinding>::data_type(), true);
         let entries = DataType::Struct(vec![Arc::new(key_f), Arc::new(val_f)].into());
-        DataType::Map(Field::new("entries", entries, false).into(), SORTED)
+        DataType::Map(Field::new(ENTRIES, entries, false).into(), SORTED)
     }
     fn new_builder(_capacity: usize) -> Self::Builder {
         let kb = <K as ArrowBinding>::new_builder(0);
         let vb = <V as ArrowBinding>::new_builder(0);
-        MapBuilder::new(None, kb, vb)
+        MapBuilder::new(Some(field_names()), kb, vb)
     }
     fn append_value(b: &mut Self::Builder, v: &Self) {
         for (k, val_opt) in &v.0 {
@@ -216,15 +233,15 @@ where
     type Builder = MapBuilder<<K as ArrowBinding>::Builder, <V as ArrowBinding>::Builder>;
     type Array = MapArray;
     fn data_type() -> DataType {
-        let key_f = Field::new("keys", <K as ArrowBinding>::data_type(), false);
-        let val_f = Field::new("values", <V as ArrowBinding>::data_type(), true);
+        let key_f = Field::new(KEYS, <K as ArrowBinding>::data_type(), false);
+        let val_f = Field::new(VALUES, <V as ArrowBinding>::data_type(), true);
         let entries = DataType::Struct(vec![Arc::new(key_f), Arc::new(val_f)].into());
-        DataType::Map(Field::new("entries", entries, false).into(), true)
+        DataType::Map(Field::new(ENTRIES, entries, false).into(), true)
     }
     fn new_builder(_capacity: usize) -> Self::Builder {
         let kb = <K as ArrowBinding>::new_builder(0);
         let vb = <V as ArrowBinding>::new_builder(0);
-        MapBuilder::new(None, kb, vb)
+        MapBuilder::new(Some(field_names()), kb, vb)
     }
     fn append_value(b: &mut Self::Builder, v: &Self) {
         for (k, val) in &v.0 {
@@ -275,15 +292,15 @@ where
     type Builder = MapBuilder<<K as ArrowBinding>::Builder, <V as ArrowBinding>::Builder>;
     type Array = MapArray;
     fn data_type() -> DataType {
-        let key_f = Field::new("keys", <K as ArrowBinding>::data_type(), false);
-        let val_f = Field::new("values", <V as ArrowBinding>::data_type(), true);
+        let key_f = Field::new(KEYS, <K as ArrowBinding>::data_type(), false);
+        let val_f = Field::new(VALUES, <V as ArrowBinding>::data_type(), true);
         let entries = DataType::Struct(vec![Arc::new(key_f), Arc::new(val_f)].into());
-        DataType::Map(Field::new("entries", entries, false).into(), true)
+        DataType::Map(Field::new(ENTRIES, entries, false).into(), true)
     }
     fn new_builder(_capacity: usize) -> Self::Builder {
         let kb = <K as ArrowBinding>::new_builder(0);
         let vb = <V as ArrowBinding>::new_builder(0);
-        MapBuilder::new(None, kb, vb)
+        MapBuilder::new(Some(field_names()), kb, vb)
     }
     fn append_value(b: &mut Self::Builder, v: &Self) {
         for (k, val_opt) in &v.0 {
@@ -476,7 +493,7 @@ where
             .ok_or_else(|| crate::schema::ViewAccessError::TypeMismatch {
                 expected: K::data_type(),
                 actual: entries.column(0).data_type().clone(),
-                field_name: Some("keys"),
+                field_name: Some(KEYS),
             })?;
         let values_array = entries
             .column(1)
@@ -485,7 +502,7 @@ where
             .ok_or_else(|| crate::schema::ViewAccessError::TypeMismatch {
                 expected: V::data_type(),
                 actual: entries.column(1).data_type().clone(),
-                field_name: Some("values"),
+                field_name: Some(VALUES),
             })?;
 
         Ok(MapView::new(keys_array, values_array, start, end))
@@ -532,7 +549,7 @@ where
             .ok_or_else(|| crate::schema::ViewAccessError::TypeMismatch {
                 expected: K::data_type(),
                 actual: entries.column(0).data_type().clone(),
-                field_name: Some("keys"),
+                field_name: Some(KEYS),
             })?;
         let values_array = entries
             .column(1)
@@ -541,7 +558,7 @@ where
             .ok_or_else(|| crate::schema::ViewAccessError::TypeMismatch {
                 expected: V::data_type(),
                 actual: entries.column(1).data_type().clone(),
-                field_name: Some("values"),
+                field_name: Some(VALUES),
             })?;
 
         Ok(MapView::new(keys_array, values_array, start, end))
@@ -769,7 +786,7 @@ where
             .ok_or_else(|| crate::schema::ViewAccessError::TypeMismatch {
                 expected: K::data_type(),
                 actual: entries.column(0).data_type().clone(),
-                field_name: Some("keys"),
+                field_name: Some(KEYS),
             })?;
         let values_array = entries
             .column(1)
@@ -778,7 +795,7 @@ where
             .ok_or_else(|| crate::schema::ViewAccessError::TypeMismatch {
                 expected: V::data_type(),
                 actual: entries.column(1).data_type().clone(),
-                field_name: Some("values"),
+                field_name: Some(VALUES),
             })?;
 
         Ok(MapViewNullable::new(keys_array, values_array, start, end))
@@ -825,7 +842,7 @@ where
             .ok_or_else(|| crate::schema::ViewAccessError::TypeMismatch {
                 expected: K::data_type(),
                 actual: entries.column(0).data_type().clone(),
-                field_name: Some("keys"),
+                field_name: Some(KEYS),
             })?;
         let values_array = entries
             .column(1)
@@ -834,7 +851,7 @@ where
             .ok_or_else(|| crate::schema::ViewAccessError::TypeMismatch {
                 expected: V::data_type(),
                 actual: entries.column(1).data_type().clone(),
-                field_name: Some("values"),
+                field_name: Some(VALUES),
             })?;
 
         Ok(MapViewNullable::new(keys_array, values_array, start, end))

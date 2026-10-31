@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use typed_arrow::{prelude::*, schema::SchemaMeta};
 
 #[derive(Record)]
@@ -15,13 +13,13 @@ struct MetaDemo {
 fn schema_and_field_metadata_are_applied() {
     // Top-level schema metadata
     let schema = <MetaDemo as SchemaMeta>::schema();
-    let m: &HashMap<String, String> = schema.metadata();
+    let m = schema.metadata();
     assert_eq!(m.get("owner"), Some(&"team".to_string()));
     assert_eq!(m.get("env"), Some(&"dev".to_string()));
 
     // Field-level metadata on column 'a'
     let fa = schema.field_with_name("a").unwrap();
-    let fam: &HashMap<String, String> = fa.metadata();
+    let fam = fa.metadata();
     assert_eq!(fam.get("pii"), Some(&"no".to_string()));
 
     // Column 'b' has no field metadata
